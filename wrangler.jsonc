@@ -1,0 +1,6 @@
+// Cloudflare Pages project config. The site is a static export (`next build` writes ./out).
+{
+  "name": "janhavi-portfolio",
+  "pages_build_output_dir": "./out",
+  "compatibility_date": "2026-10-01"
+}
