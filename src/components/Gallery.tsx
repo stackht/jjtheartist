@@ -11,7 +11,7 @@ import { useElementProgress } from "./hooks"
 type Work = (typeof WORKS)[number]
 const noop = () => () => {}
 // Matches the CSS that pins the wall and lays it out right to left.
-const PINNED = "(min-width: 960px) and (min-height: 600px)"
+const PINNED = "(min-height: 520px)"
 const onPinnedChange = (cb: () => void) => {
   const mq = window.matchMedia(PINNED)
   mq.addEventListener("change", cb)
@@ -183,7 +183,7 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
     () => window.matchMedia(PINNED).matches,
     () => false,
   )
-  // Pinned, the wall runs right to left: it starts on the first piece at the right and
+  // Pinned (any screen tall enough, phones too), the wall runs right to left: it starts on the first piece at the right and
   // slides rightwards as the page scrolls down, bringing later pieces in from the left.
   // Frames open once as the wall arrives. (Per-frame in-view checks miss frames that enter from
   // the left of the clipped, shifted track, so they would never open.)

@@ -967,47 +967,6 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
   .swatch-list li {
     min-height: min(74px, 9dvh);
   }
-  /* The wall is pinned: the page scrolls down while the wall slides sideways. */
-  .work {
-    display: flex;
-    flex-direction: column;
-  }
-  .work-head {
-    position: absolute;
-    inset: 0 0 auto;
-    z-index: 2;
-    width: 100%;
-    padding-top: max(100px, 12dvh);
-    pointer-events: none;
-  }
-  .wall-pin {
-    /* Scroll this many pixels down for each pixel the wall slides, so it drifts past slowly. */
-    --pace: 6;
-    height: calc(100dvh + var(--shift, 0px) * var(--pace));
-  }
-  .wall-sticky {
-    position: sticky;
-    top: 0;
-    height: 100dvh;
-    display: flex;
-    align-items: flex-end;
-  }
-  .wall-track {
-    flex-direction: row-reverse;
-    padding-top: 0;
-    padding-bottom: max(36px, 6dvh);
-    padding-left: var(--gutter);
-    padding-right: max(var(--gutter), calc(50vw - var(--col) / 2 + var(--gutter)));
-  }
-  .frame--0 .mat,
-  .frame--2 .mat {
-    width: auto;
-    height: min(46dvh, 470px);
-  }
-  .frame--1 .mat {
-    width: auto;
-    height: min(40dvh, 420px);
-  }
 }
 
 /* ─────────────────────────── Tablet / phone ─────────────────────────── */
@@ -1023,7 +982,7 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
   .contact-links {
     grid-template-columns: minmax(0, 1fr);
   }
-  /* The wall becomes a swipeable row. */
+  /* On a short landscape screen the wall is a swipeable row; taller screens pin it (below). */
   .wall-sticky {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -1350,3 +1309,64 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
   }
 }
 .defs{position:absolute;width:0;height:0;overflow:hidden}
+
+/* The wall is pinned on any screen tall enough, phones included: the page scrolls down while
+   the wall slides sideways. Comes last so it overrides the swipeable row above. */
+@media (min-height: 520px) {
+  .work {
+    display: flex;
+    flex-direction: column;
+  }
+  .work-head {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+    width: 100%;
+    padding-top: max(100px, 12dvh);
+    pointer-events: none;
+  }
+  .wall-pin {
+    /* Scroll this many pixels down for each pixel the wall slides, so it drifts past slowly. */
+    --pace: 6;
+    height: calc(100dvh + var(--shift, 0px) * var(--pace));
+  }
+  .wall-sticky {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+  }
+  .wall-track {
+    flex-direction: row-reverse;
+    padding-top: 0;
+    padding-bottom: max(36px, 6dvh);
+    padding-left: var(--gutter);
+    padding-right: max(var(--gutter), calc(50vw - var(--col) / 2 + var(--gutter)));
+  }
+  .frame--0 .mat,
+  .frame--2 .mat {
+    width: auto;
+    height: min(46dvh, 470px);
+  }
+  .frame--1 .mat {
+    width: auto;
+    height: min(40dvh, 420px);
+  }
+}
+@media (min-height: 520px) and (max-width: 959px) {
+  .wall-sticky {
+    overflow: hidden;
+    scroll-snap-type: none;
+  }
+  .wall-track {
+    padding-bottom: max(28px, 4dvh);
+  }
+  .frame--0 .mat,
+  .frame--2 .mat {
+    height: min(36dvh, 420px);
+  }
+  .frame--1 .mat {
+    height: min(30dvh, 360px);
+  }
+}
