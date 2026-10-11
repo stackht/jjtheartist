@@ -1338,20 +1338,18 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
     align-items: flex-end;
   }
   .wall-track {
-    flex-direction: row-reverse;
     padding-top: 0;
     padding-bottom: max(36px, 6dvh);
-    padding-left: var(--gutter);
-    padding-right: max(var(--gutter), calc(50vw - var(--col) / 2 + var(--gutter)));
   }
+  /* Frames shrink on short windows so they stay below the heading and intro. */
   .frame--0 .mat,
   .frame--2 .mat {
     width: auto;
-    height: min(46dvh, 470px);
+    height: min(46dvh, 470px, calc(100dvh - 450px));
   }
   .frame--1 .mat {
     width: auto;
-    height: min(40dvh, 420px);
+    height: min(40dvh, 420px, calc(100dvh - 480px));
   }
 }
 @media (min-height: 520px) and (max-width: 959px) {

@@ -10,13 +10,6 @@ import { useElementProgress } from "./hooks"
 
 type Work = (typeof WORKS)[number]
 const noop = () => () => {}
-// Matches the CSS that pins the wall and lays it out right to left.
-const PINNED = "(min-height: 520px)"
-const onPinnedChange = (cb: () => void) => {
-  const mq = window.matchMedia(PINNED)
-  mq.addEventListener("change", cb)
-  return () => mq.removeEventListener("change", cb)
-}
 const EASE = [0.16, 1, 0.3, 1] as const
 
 // One shared painter worker; canvases are handed over once (transferControlToOffscreen
@@ -178,17 +171,12 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
     [0, 0],
     [1, 1],
   ])
-  const pinned = useSyncExternalStore(
-    onPinnedChange,
-    () => window.matchMedia(PINNED).matches,
-    () => false,
-  )
-  // Pinned (any screen tall enough, phones too), the wall runs right to left: it starts on the first piece at the right and
-  // slides rightwards as the page scrolls down, bringing later pieces in from the left.
-  // Frames open once as the wall arrives. (Per-frame in-view checks miss frames that enter from
-  // the left of the clipped, shifted track, so they would never open.)
-  const wallIn = useInView(pinRef, { once: true, amount: 0.05 })
-  const x = useTransform(progress, (p) => (pinned ? -(1 - p) * shift : -p * shift))
+  // Frames open once, as soon as any of the wall is on screen. (The pinned wall is many screens
+  // tall, so waiting for a share of it to be visible could leave the frames shut on short windows.)
+  const wallIn = useInView(pinRef, { once: true })
+  // Moving down the page walks the wall from the first piece: the cards travel right to left,
+  // and back again on the way up.
+  const x = useTransform(progress, (p) => -p * shift)
 
   useEffect(() => {
     const track = trackRef.current
