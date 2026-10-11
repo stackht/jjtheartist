@@ -181,13 +181,17 @@ function About({ reduced }: { reduced: boolean }) {
 function Work({ reduced }: { reduced: boolean }) {
   return (
     <section id="work" className="work" aria-labelledby="work-h">
-      <div className="work-head">
-        <RevealHeading id="work-h" text="Code and canvas." reduced={reduced} />
-        <Rise reduced={reduced}>
-          <p className="sec-lead">Engineering projects and paintings on one wall. Scroll to walk it; open any piece to look closer.</p>
-        </Rise>
-      </div>
-      <Gallery reduced={reduced} />
+      <Gallery
+        reduced={reduced}
+        head={
+          <div className="work-head">
+            <RevealHeading id="work-h" text="Code and canvas." reduced={reduced} />
+            <Rise reduced={reduced}>
+              <p className="sec-lead">Engineering projects and paintings on one wall. Scroll to walk it; open any piece to look closer.</p>
+            </Rise>
+          </div>
+        }
+      />
     </section>
   )
 }

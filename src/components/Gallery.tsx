@@ -166,7 +166,7 @@ function Viewer({
  * The work as a salon wall. On wide screens the wall slides sideways while the page scrolls
  * down; on phones it is a swipeable row. Opening a piece floods the screen with its colour.
  */
-export default function Gallery({ reduced }: { reduced: boolean }) {
+export default function Gallery({ reduced, head }: { reduced: boolean; head?: React.ReactNode }) {
   const pinRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [shift, setShift] = useState(0)
@@ -208,40 +208,43 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
     <>
       <div className="wall-pin" ref={pinRef} style={{ ["--shift" as string]: `${shift}px` }}>
         <div className="wall-sticky">
-          {/* Driven by the visitor's own scrolling, so it stays on with reduced motion too. */}
-          <motion.div className="wall-track" ref={trackRef} style={{ x }}>
-            {WORKS.map((w, i) => (
-              <motion.button
-                key={w.id}
-                type="button"
-                className={`frame frame--${i % 3}`}
-                onClick={(e) => setOpen({ i, x: e.clientX, y: e.clientY })}
-                variants={FRAME_REVEAL}
-                initial="shut"
-                animate={reduced || wallIn ? "open" : "shut"}
-                // With reduced motion the frames are simply there; no iris opening.
-                transition={reduced ? { duration: 0 } : { duration: 1.4, ease: EASE, delay: i * 0.12 }}
-                aria-label={`Open ${w.title}`}
-              >
-                <span className="frame-spec" aria-hidden="true">
-                  Frame <b>{i % 3 === 1 ? "900 × 760" : "760 × 960"}</b>
-                </span>
-                <span className="mat">
-                  <Painting work={w} seed={i * 7919 + 11} w={i % 3 === 1 ? 900 : 760} h={i % 3 === 1 ? 760 : 960} />
-                </span>
-                <span className="label">
-                  <span className={`tag tag--${w.kind === "Engineering" ? "eng" : "art"}`}>{w.kind}</span>
-                  <b>{w.title}</b>
-                  <span>
-                    {w.medium}, {w.year}
+          {/* The heading is pinned with the wall, so only the paper behind them scrolls. */}
+          {head}
+          <div className="wall-scroll">
+            <motion.div className="wall-track" ref={trackRef} style={{ x }}>
+              {WORKS.map((w, i) => (
+                <motion.button
+                  key={w.id}
+                  type="button"
+                  className={`frame frame--${i % 3}`}
+                  onClick={(e) => setOpen({ i, x: e.clientX, y: e.clientY })}
+                  variants={FRAME_REVEAL}
+                  initial="shut"
+                  animate={reduced || wallIn ? "open" : "shut"}
+                  // With reduced motion the frames are simply there; no iris opening.
+                  transition={reduced ? { duration: 0 } : { duration: 1.4, ease: EASE, delay: i * 0.12 }}
+                  aria-label={`Open ${w.title}`}
+                >
+                  <span className="frame-spec" aria-hidden="true">
+                    Frame <b>{i % 3 === 1 ? "900 × 760" : "760 × 960"}</b>
                   </span>
-                </span>
-              </motion.button>
-            ))}
-            {WORKS_ARE_SAMPLES && (
-              <p className="wall-note">Sample projects and paintings, generated for this preview. The real work is coming soon.</p>
-            )}
-          </motion.div>
+                  <span className="mat">
+                    <Painting work={w} seed={i * 7919 + 11} w={i % 3 === 1 ? 900 : 760} h={i % 3 === 1 ? 760 : 960} />
+                  </span>
+                  <span className="label">
+                    <span className={`tag tag--${w.kind === "Engineering" ? "eng" : "art"}`}>{w.kind}</span>
+                    <b>{w.title}</b>
+                    <span>
+                      {w.medium}, {w.year}
+                    </span>
+                  </span>
+                </motion.button>
+              ))}
+              {WORKS_ARE_SAMPLES && (
+                <p className="wall-note">Sample projects and paintings, generated for this preview. The real work is coming soon.</p>
+              )}
+            </motion.div>
+          </div>
         </div>
       </div>
       {/* Portalled to <body> so it covers the fixed name pill and menu, not just the wall's layer. */}
