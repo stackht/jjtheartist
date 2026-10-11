@@ -1296,18 +1296,6 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
 @media (max-width: 760px) {
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  html:not([data-boot="done"]) :is(.brand, .swatch-dock, .progress) {
-    opacity: 1;
-  }
-}
 .defs{position:absolute;width:0;height:0;overflow:hidden}
 
 /* The wall is pinned on any screen tall enough, phones included: the page scrolls down while

@@ -3,16 +3,12 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react"
 import { motionValue, useTransform, type MotionValue } from "framer-motion"
 
+/**
+ * Motion stays on for every visitor, whatever the OS "reduce motion" setting says: the site's
+ * movement is part of the work. Kept as a hook so components still read it in one place.
+ */
 export function useReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
-    const update = () => setReduced(mq.matches)
-    update()
-    mq.addEventListener("change", update)
-    return () => mq.removeEventListener("change", update)
-  }, [])
-  return reduced
+  return false
 }
 
 export function useInView(ref: RefObject<Element | null>, rootMargin = "0px") {
