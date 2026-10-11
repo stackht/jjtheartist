@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
-import { Bricolage_Grotesque, Figtree, JetBrains_Mono } from "next/font/google"
+import { Bricolage_Grotesque, Caveat, Figtree, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 
 const display = Bricolage_Grotesque({
@@ -21,6 +21,13 @@ const mono = JetBrains_Mono({
   weight: ["400", "500"],
 })
 
+// Her handwriting in the margins: notes, page numbers, the signature.
+const hand = Caveat({
+  variable: "--font-hand",
+  subsets: ["latin"],
+  weight: ["500", "700"],
+})
+
 export const metadata: Metadata = {
   title: "Janhavi Jadhav · Software & UI engineer who paints",
   description: "Janhavi Jadhav is a software and UI engineer who paints: interfaces built with precision, and watercolours full of light.",
@@ -36,7 +43,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     // Browser extensions often add attributes to <html> before React hydrates; ignore those.
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${hand.variable}`} suppressHydrationWarning>
       <body>
         {/* Decide before hydration whether the opening drop plays (once per session). */}
         <Script id="intro-gate" strategy="beforeInteractive">
