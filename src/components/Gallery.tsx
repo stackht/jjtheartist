@@ -11,6 +11,10 @@ import { useElementProgress } from "./hooks"
 type Work = (typeof WORKS)[number]
 const noop = () => () => {}
 const EASE = [0.16, 1, 0.3, 1] as const
+const FRAME_REVEAL = {
+  shut: { clipPath: "circle(0% at 50% 55%)" },
+  open: { clipPath: "circle(110% at 50% 55%)" },
+}
 
 // One shared painter worker; canvases are handed over once (transferControlToOffscreen
 // can only be called once per canvas, which matters under React's dev double-mount).
@@ -212,9 +216,11 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
                 type="button"
                 className={`frame frame--${i % 3}`}
                 onClick={(e) => setOpen({ i, x: e.clientX, y: e.clientY })}
-                initial={reduced ? false : { clipPath: "circle(0% at 50% 55%)" }}
-                animate={reduced || wallIn ? { clipPath: "circle(110% at 50% 55%)" } : undefined}
-                transition={{ duration: 1.4, ease: EASE, delay: i * 0.12 }}
+                variants={FRAME_REVEAL}
+                initial="shut"
+                animate={reduced || wallIn ? "open" : "shut"}
+                // With reduced motion the frames are simply there; no iris opening.
+                transition={reduced ? { duration: 0 } : { duration: 1.4, ease: EASE, delay: i * 0.12 }}
                 aria-label={`Open ${w.title}`}
               >
                 <span className="frame-spec" aria-hidden="true">
