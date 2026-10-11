@@ -982,7 +982,7 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
   }
   .wall-pin {
     /* Scroll this many pixels down for each pixel the wall slides, so it drifts past slowly. */
-    --pace: 2.25;
+    --pace: 4;
     height: calc(100dvh + var(--shift, 0px) * var(--pace));
   }
   .wall-sticky {
