@@ -119,8 +119,14 @@ p {
 /* ─────────────────────────── The wet paper ─────────────────────────── */
 
 .wet-paper {
+  /* Sized to the largest viewport, so a phone's address bar sliding in and out while
+     scrolling doesn't resize (and blank) the canvas. */
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
   pointer-events: none;
   background: var(--paper);

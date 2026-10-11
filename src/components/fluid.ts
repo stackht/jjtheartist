@@ -296,15 +296,51 @@ export function createFluid(canvas: HTMLCanvasElement, quality: Quality): Fluid 
     curl = texture(s.w, s.h, gl.R16F, gl.RED)
   }
 
+  const free = (f: FBO) => {
+    gl.deleteTexture(f.tex)
+    gl.deleteFramebuffer(f.fbo)
+  }
+  const freeAll = () => {
+    for (const d of [velocity, dye, pressure]) {
+      free(d.read)
+      free(d.write)
+    }
+    free(divergence)
+    free(curl)
+  }
+
+  // Resizing used to start the paper over (and clearing the canvas showed as a blink).
+  // Now the paint and its motion are resampled into the new buffers, and the frame is drawn
+  // again straight away so the canvas is never shown empty.
   const resize = () => {
     const w = Math.max(1, Math.round(canvas.clientWidth * DPR))
     const h = Math.max(1, Math.round(canvas.clientHeight * DPR))
     if (canvas.width === w && canvas.height === h && velocity) return
     canvas.width = w
     canvas.height = h
+    if (!velocity) {
+      allocate()
+      return
+    }
+    const old = { velocity, dye, pressure, divergence, curl }
     allocate()
+    const carry = (from: FBO, to: FBO) => {
+      const u = bindProgram("scale")
+      gl.uniform2f(u.texel, 1 / to.w, 1 / to.h)
+      gl.uniform1i(u.uTexture, bindTex(0, from.tex))
+      gl.uniform1f(u.value, 1)
+      blit(to)
+    }
+    carry(old.dye.read, dye.read)
+    carry(old.velocity.read, velocity.read)
+    for (const d of [old.velocity, old.dye, old.pressure]) {
+      free(d.read)
+      free(d.write)
+    }
+    free(old.divergence)
+    free(old.curl)
+    render()
   }
-  resize()
 
   const bindProgram = (name: string) => {
     gl.useProgram(progs[name].p)
@@ -430,18 +466,12 @@ export function createFluid(canvas: HTMLCanvasElement, quality: Quality): Fluid 
   // Release GPU memory but keep the context: React may mount the canvas again (dev
   // strict mode, fast refresh), and a lost context can't be recreated on the same canvas.
   const destroy = () => {
-    for (const d of [velocity, dye, pressure]) for (const f of [d.read, d.write]) {
-      gl.deleteTexture(f.tex)
-      gl.deleteFramebuffer(f.fbo)
-    }
-    for (const f of [divergence, curl]) {
-      gl.deleteTexture(f.tex)
-      gl.deleteFramebuffer(f.fbo)
-    }
+    freeAll()
     Object.values(progs).forEach(({ p }) => gl.deleteProgram(p))
     gl.deleteBuffer(quad)
     gl.deleteTexture(paperTex)
   }
 
+  resize()
   return { splat, step, render, resize, destroy }
 }
