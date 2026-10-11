@@ -144,7 +144,8 @@ p {
     var(--paper);
 }
 
-/* Paper sheets cover the paint between the hero and the contact section. */
+/* Paper sheets cover the paint between the hero and the contact section. The paint keeps
+   drying underneath, so it is still alive when the visitor comes back. */
 .sheets {
   position: relative;
   z-index: 1;

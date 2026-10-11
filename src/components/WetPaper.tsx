@@ -26,16 +26,14 @@ function brushPath(rnd: () => number, region: [number, number, number, number]):
 
 /**
  * The wet paper behind the hero and contact sections: a watercolour simulation the visitor
- * paints into. Pauses whenever it isn't visible.
+ * paints into. It keeps running while the middle sections cover it, and pauses only while
+ * the tab is hidden.
  */
 export default function WetPaper({
-  active,
   reduced,
   boot,
   onBloom,
 }: {
-  /** Whether any part of the paper is on screen. */
-  active: boolean
   reduced: boolean
   /** Play the opening drop (first visit of the session). */
   boot: boolean
@@ -45,7 +43,6 @@ export default function WetPaper({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fluidRef = useRef<Fluid | null>(null)
   const strokes = useRef<Stroke[]>([])
-  const activeRef = useRef(active)
   const [mode, setMode] = useState<"pending" | "live" | "fallback">("pending")
   const onBloomRef = useRef(onBloom)
   useEffect(() => {
@@ -118,10 +115,6 @@ export default function WetPaper({
     onBloomRef.current?.()
   }, [mode, boot, reduced])
 
-  useEffect(() => {
-    activeRef.current = active
-  }, [active])
-
   // The render loop, the visitor's brush, and ambient strokes when nobody is painting.
   useEffect(() => {
     const fluid = fluidRef.current
@@ -136,7 +129,6 @@ export default function WetPaper({
     let prev: { x: number; y: number; t: number } | null = null
 
     const brush = (cx: number, cy: number) => {
-      if (!activeRef.current) return
       const t = performance.now()
       const x = cx / window.innerWidth
       const y = 1 - cy / window.innerHeight
@@ -174,8 +166,8 @@ export default function WetPaper({
       const dt = Math.min(raw, 1 / 30)
       last = now
       if (raw > 0) brushState.fps += (1 / raw - brushState.fps) * 0.05
-      brushState.live = activeRef.current && !document.hidden
-      if (!activeRef.current || document.hidden) return
+      brushState.live = !document.hidden
+      if (document.hidden) return
 
       if (!reduced && now > nextAmbient && now - lastInput > 3000) {
         const name = AMBIENT[Math.floor(Math.random() * AMBIENT.length)]

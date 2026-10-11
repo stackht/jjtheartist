@@ -7,7 +7,7 @@ import { motion, useTransform } from "framer-motion"
 import { ArrowUpRight, Check, Copy, EnvelopeSimple, GithubLogo, InstagramLogo, LinkedinLogo } from "@phosphor-icons/react"
 import { ABOUT, ARTIST, LINKS, PATH, PATH_IS_PLACEHOLDER, TOOLS } from "@/content/site"
 import { brushState, PIGMENT_HEX } from "./brushState"
-import { useElementProgress, useInView, useIntroSkipped, useReducedMotion } from "./hooks"
+import { useElementProgress, useIntroSkipped, useReducedMotion } from "./hooks"
 import { Magnetic, RevealHeading, Rise, ScrollLitText } from "./motion"
 import SwatchNav from "./SwatchNav"
 import Gallery from "./Gallery"
@@ -310,11 +310,6 @@ export default function Page() {
   const skipped = useIntroSkipped()
   const lenisRef = useRef<Lenis | null>(null)
   const siteRef = useRef<HTMLDivElement>(null)
-  const heroRef = useRef<HTMLDivElement>(null)
-  const contactRef = useRef<HTMLDivElement>(null)
-  // Pause the paint once less than about a third of the hero is left on screen.
-  const heroIn = useInView(heroRef, "-30% 0px 0px 0px")
-  const contactIn = useInView(contactRef)
   const [bloomed, setBloomed] = useState(false)
   const revealed = reduced || bloomed
   const progress = useElementProgress(siteRef, [
@@ -384,21 +379,17 @@ export default function Page() {
           <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-      <WetPaper active={heroIn || contactIn} reduced={reduced} boot={!skipped} onBloom={() => setBloomed(true)} />
+      <WetPaper reduced={reduced} boot={!skipped} onBloom={() => setBloomed(true)} />
       <motion.div className="progress" style={{ scaleX: bar }} aria-hidden="true" />
       <SwatchNav onJump={jump} />
-      <div ref={heroRef}>
-        <Hero revealed={revealed} reduced={reduced} onJump={jump} />
-      </div>
+      <Hero revealed={revealed} reduced={reduced} onJump={jump} />
       <main className="sheets">
         <About reduced={reduced} />
         <Work reduced={reduced} />
         <Tools reduced={reduced} />
         <Path reduced={reduced} />
       </main>
-      <div ref={contactRef}>
-        <Contact reduced={reduced} />
-      </div>
+      <Contact reduced={reduced} />
     </div>
   )
 }
