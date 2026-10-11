@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
-import { AnimatePresence, motion, useTransform } from "framer-motion"
+import { AnimatePresence, motion, useInView, useTransform } from "framer-motion"
 import { ArrowLeft, ArrowRight, X } from "@phosphor-icons/react"
 import { WORKS, WORKS_ARE_SAMPLES } from "@/content/site"
 import { paint } from "./paintings"
@@ -10,6 +10,13 @@ import { useElementProgress } from "./hooks"
 
 type Work = (typeof WORKS)[number]
 const noop = () => () => {}
+// Matches the CSS that pins the wall and lays it out right to left.
+const PINNED = "(min-width: 960px) and (min-height: 600px)"
+const onPinnedChange = (cb: () => void) => {
+  const mq = window.matchMedia(PINNED)
+  mq.addEventListener("change", cb)
+  return () => mq.removeEventListener("change", cb)
+}
 const EASE = [0.16, 1, 0.3, 1] as const
 
 // One shared painter worker; canvases are handed over once (transferControlToOffscreen
@@ -171,7 +178,17 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
     [0, 0],
     [1, 1],
   ])
-  const x = useTransform(progress, (p) => -p * shift)
+  const pinned = useSyncExternalStore(
+    onPinnedChange,
+    () => window.matchMedia(PINNED).matches,
+    () => false,
+  )
+  // Pinned, the wall runs right to left: it starts on the first piece at the right and
+  // slides rightwards as the page scrolls down, bringing later pieces in from the left.
+  // Frames open once as the wall arrives. (Per-frame in-view checks miss frames that enter from
+  // the left of the clipped, shifted track, so they would never open.)
+  const wallIn = useInView(pinRef, { once: true, amount: 0.05 })
+  const x = useTransform(progress, (p) => (pinned ? -(1 - p) * shift : -p * shift))
 
   useEffect(() => {
     const track = trackRef.current
@@ -208,9 +225,8 @@ export default function Gallery({ reduced }: { reduced: boolean }) {
                 className={`frame frame--${i % 3}`}
                 onClick={(e) => setOpen({ i, x: e.clientX, y: e.clientY })}
                 initial={reduced ? false : { clipPath: "circle(0% at 50% 55%)" }}
-                whileInView={{ clipPath: "circle(110% at 50% 55%)" }}
-                viewport={{ once: true, margin: "0px -5% 0px -5%" }}
-                transition={{ duration: 1.4, ease: EASE, delay: (i % 3) * 0.08 }}
+                animate={reduced || wallIn ? { clipPath: "circle(110% at 50% 55%)" } : undefined}
+                transition={{ duration: 1.4, ease: EASE, delay: i * 0.12 }}
                 aria-label={`Open ${w.title}`}
               >
                 <span className="frame-spec" aria-hidden="true">

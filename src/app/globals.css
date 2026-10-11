@@ -982,7 +982,7 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
   }
   .wall-pin {
     /* Scroll this many pixels down for each pixel the wall slides, so it drifts past slowly. */
-    --pace: 4;
+    --pace: 6;
     height: calc(100dvh + var(--shift, 0px) * var(--pace));
   }
   .wall-sticky {
@@ -993,8 +993,11 @@ html:not([data-intro="skip"]):not([data-boot="done"]) :is(.brand, .swatch-dock, 
     align-items: flex-end;
   }
   .wall-track {
+    flex-direction: row-reverse;
     padding-top: 0;
     padding-bottom: max(36px, 6dvh);
+    padding-left: var(--gutter);
+    padding-right: max(var(--gutter), calc(50vw - var(--col) / 2 + var(--gutter)));
   }
   .frame--0 .mat,
   .frame--2 .mat {
